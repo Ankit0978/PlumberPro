@@ -42,6 +42,7 @@ const Header = () => {
                         {user && user.role === 'admin' && (
                             <>
                                 <li><Link to="/admin" onClick={() => setIsOpen(false)}>Admin Panel</Link></li>
+                                <li><Link to="/signup" onClick={() => setIsOpen(false)}>Register User</Link></li>
                                 <li><button onClick={() => { setShowLogs(true); setIsOpen(false); }} className="btn-link" style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: 'inherit', fontFamily: 'inherit' }}>Transactions</button></li>
                             </>
                         )}

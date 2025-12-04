@@ -4,8 +4,18 @@ const Footer = () => {
     return (
         <footer className="footer">
             <div className="container">
-                <p>&copy; {new Date().getFullYear()} PlumberPro. All rights reserved.</p>
-                <p>Designed for Excellence.</p>
+                <div className="footer-content">
+                    <div className="footer-section">
+                        <h4>PlumberPro</h4>
+                        <p>Expert plumbing services in Pune.</p>
+                    </div>
+                    <div className="footer-section">
+                        <h4>Contact</h4>
+                        <p>📞 +91 8318440978</p>
+                        <p>✉️ ankitjha084@gmail.com</p>
+                    </div>
+                </div>
+                <p className="copyright">&copy; {new Date().getFullYear()} PlumberPro. All rights reserved.</p>
             </div>
         </footer>
     );

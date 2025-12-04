@@ -20,26 +20,36 @@ const CustomerDashboard = () => {
         refreshData();
     }, [user]);
 
-    const handleBookService = (service) => {
-        if (!window.confirm(`Do you want to book ${service.title}? We will request your location for the agent.`)) return;
+    const [location, setLocation] = useState(null);
+    const [isLocating, setIsLocating] = useState(false);
 
-        if (navigator.geolocation) {
+    const handleGetLocation = () => {
+        setIsLocating(true);
+        if ('geolocation' in navigator) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    const location = {
+                    setLocation({
                         lat: position.coords.latitude,
                         lng: position.coords.longitude
-                    };
-                    createBooking(service, location);
+                    });
+                    setIsLocating(false);
+                    alert('Location captured! You can now book the service.');
                 },
                 (error) => {
-                    alert("Location access denied. Booking without precise location.");
-                    createBooking(service, null);
+                    console.error("Error getting location:", error);
+                    setIsLocating(false);
+                    alert('Could not get location. Booking will proceed without it.');
                 }
             );
         } else {
-            createBooking(service, null);
+            setIsLocating(false);
+            alert('Geolocation is not supported.');
         }
+    };
+
+    const handleBookService = (service) => {
+        if (!window.confirm(`Confirm booking for ${service.title}?`)) return;
+        createBooking(service, location);
     };
 
     const createBooking = (service, location) => {
@@ -70,8 +80,16 @@ const CustomerDashboard = () => {
                             <p className="price">₹{svc.price}</p>
                             <p>{svc.description}</p>
                             <button
+                                className="btn btn-secondary"
+                                style={{ marginTop: '10px', width: '100%', marginBottom: '5px', fontSize: '14px' }}
+                                onClick={handleGetLocation}
+                                disabled={isLocating || location}
+                            >
+                                {isLocating ? 'Locating...' : location ? '📍 Location Captured' : '📍 Share Location'}
+                            </button>
+                            <button
                                 className="btn btn-primary"
-                                style={{ marginTop: '10px', width: '100%' }}
+                                style={{ width: '100%' }}
                                 onClick={() => handleBookService(svc)}
                             >
                                 Book Now
