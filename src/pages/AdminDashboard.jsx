@@ -1,81 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import { getUsers, getTransactions, getServices, updateServiceStatus, refundTransaction } from '../utils/db';
-
-const AdminDashboard = () => {
-    const [users, setUsers] = useState([]);
-    const [transactions, setTransactions] = useState([]);
-    const [pendingServices, setPendingServices] = useState([]);
-
-    const refreshData = () => {
-        setUsers(getUsers());
-        setTransactions(getTransactions());
-        const allServices = getServices();
-        setPendingServices(allServices.filter(s => s.status === 'pending'));
-    };
-
-    useEffect(() => {
-        refreshData();
-    }, []);
-
-    const handleServiceAction = (id, status) => {
-        updateServiceStatus(id, status);
-        refreshData();
-    };
-
-    const handleRefund = (id) => {
-        if (window.confirm('Are you sure you want to refund this transaction?')) {
-            refundTransaction(id);
-            refreshData();
-        }
-    };
-
-    return (
-        <div className="container" style={{ padding: '100px 20px' }}>
-            <h2>Admin Dashboard</h2>
-
-            {/* Pending Services Section */}
-            <div style={{ marginTop: '40px', padding: '20px', backgroundColor: '#fff3cd', borderRadius: '8px' }}>
-                <h3>⚠️ Pending Service Approvals</h3>
-                {pendingServices.length === 0 ? (
-                    <p>No pending services.</p>
-                ) : (
-                    <table className="table" style={{ width: '100%', marginTop: '10px', backgroundColor: 'white' }}>
-                        <thead>
-                            <tr>
-                                <th style={{ padding: '10px', textAlign: 'left' }}>Service</th>
-                                <th style={{ padding: '10px', textAlign: 'left' }}>Agent ID</th>
-                                <th style={{ padding: '10px', textAlign: 'left' }}>Price</th>
-                                <th style={{ padding: '10px', textAlign: 'left' }}>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {pendingServices.map(svc => (
-                                <tr key={svc.id}>
-                                    <td style={{ padding: '10px' }}>{svc.title}</td>
-                                    <td style={{ padding: '10px' }}>{svc.agentId}</td>
-                                    <td style={{ padding: '10px' }}>{svc.price}</td>
-                                    <td style={{ padding: '10px' }}>
-                                        <button
-                                            className="btn btn-success"
-                                            style={{ marginRight: '10px', padding: '5px 10px', fontSize: '12px' }}
-                                            onClick={() => handleServiceAction(svc.id, 'approved')}
-                                        >
-                                            Approve
-                                        </button>
-                                        <button
-                                            className="btn btn-danger"
-                                            style={{ padding: '5px 10px', fontSize: '12px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px' }}
-                                            onClick={() => handleServiceAction(svc.id, 'rejected')}
-                                        >
-                                            Reject
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+<tr>
+    <th style={{ padding: '10px', textAlign: 'left' }}>Service</th>
+    <th style={{ padding: '10px', textAlign: 'left' }}>Agent ID</th>
+    <th style={{ padding: '10px', textAlign: 'left' }}>Price</th>
+    <th style={{ padding: '10px', textAlign: 'left' }}>Actions</th>
+</tr>
+                        </thead >
+    <tbody>
+        {pendingServices.map(svc => (
+            <tr key={svc.id}>
+                <td style={{ padding: '10px' }}>{svc.title}</td>
+                <td style={{ padding: '10px' }}>{svc.agentId}</td>
+                <td style={{ padding: '10px' }}>{svc.price}</td>
+                <td style={{ padding: '10px' }}>
+                    <button
+                        className="btn btn-success"
+                        style={{ marginRight: '10px', padding: '5px 10px', fontSize: '12px' }}
+                        onClick={() => handleServiceAction(svc.id, 'approved')}
+                    >
+                        Approve
+                    </button>
+                    <button
+                        className="btn btn-danger"
+                        style={{ padding: '5px 10px', fontSize: '12px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px' }}
+                        onClick={() => handleServiceAction(svc.id, 'rejected')}
+                    >
+                        Reject
+                    </button>
+                </td>
+            </tr>
+        ))}
+    </tbody>
+                    </table >
                 )}
-            </div>
+            </div >
 
             <div style={{ marginTop: '40px' }}>
                 <h3>Registered Users</h3>
@@ -144,7 +103,7 @@ const AdminDashboard = () => {
                     </tbody>
                 </table>
             </div>
-        </div>
+        </div >
     );
 };
 

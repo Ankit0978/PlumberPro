@@ -104,7 +104,7 @@ export const addBooking = (booking) => {
     const newBooking = {
         ...booking,
         id: 'bk_' + Date.now(),
-        status: 'booked', // booked, completed, paid
+        status: 'pending_approval', // pending_approval, booked, completed, paid
         timestamp: new Date().toISOString()
     };
     bookings.push(newBooking);
@@ -118,7 +118,7 @@ export const getBookings = () => {
 
 export const getAgentBookings = (agentId) => {
     const bookings = getBookings();
-    return bookings.filter(b => b.agentId === agentId);
+    return bookings.filter(b => b.agentId === agentId && b.status !== 'pending_approval');
 };
 
 export const getCustomerBookings = (customerId) => {
