@@ -11,7 +11,7 @@ const Footer = () => {
                     </div>
                     <div className="footer-section">
                         <h4>Contact</h4>
-                        <p>📞 +91 8318440978</p>
+                        <p>📞 +91 9226409730 (Akshay Dnyandev Ambore)</p>
                         <p>✉️ ankitjha084@gmail.com</p>
                     </div>
                 </div>
