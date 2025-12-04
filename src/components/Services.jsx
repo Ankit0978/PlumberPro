@@ -1,27 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { getApprovedServices } from '../utils/db';
-import { useNavigate } from 'react-router-dom';
+import { services as staticServices } from '../data/servicesData';
+import PaymentModal from './PaymentModal';
 
 const Services = () => {
     const [services, setServices] = useState([]);
-    const navigate = useNavigate();
+    const [selectedService, setSelectedService] = useState(null);
 
     useEffect(() => {
         // Load services from DB
         const fetchServices = () => {
             const approvedServices = getApprovedServices();
-            setServices(approvedServices);
+            // Combine static services with approved DB services
+            // Ensure no duplicates if IDs clash (though static IDs are 1-12, DB IDs are timestamps)
+            setServices([...staticServices, ...approvedServices]);
         };
 
         fetchServices();
-        // Add event listener for storage changes to update in real-time
         window.addEventListener('storage', fetchServices);
         return () => window.removeEventListener('storage', fetchServices);
     }, []);
-
-    const handleBookClick = () => {
-        navigate('/login');
-    };
 
     return (
         <section id="services" className="services section">
@@ -33,20 +31,26 @@ const Services = () => {
                             key={service.id}
                             className="service-card"
                         >
-                            <div className="service-icon">🔧</div>
+                            <div className="service-icon">{service.icon || '🔧'}</div>
                             <h3>{service.title}</h3>
-                            <p className="price">₹{service.price}</p>
+                            <p className="price">{service.price.toString().includes('₹') ? service.price : `₹${service.price}`}</p>
                             <p className="description">{service.description}</p>
-                            <button className="btn-book" onClick={handleBookClick}>Login to Book</button>
+                            <button
+                                className="btn-book"
+                                onClick={() => setSelectedService(service)}
+                            >
+                                Book & Pay
+                            </button>
                         </div>
                     ))}
-                    {services.length === 0 && (
-                        <div style={{ textAlign: 'center', width: '100%', gridColumn: '1 / -1' }}>
-                            <p>No services currently available. Please check back later.</p>
-                        </div>
-                    )}
                 </div>
             </div>
+            {selectedService && (
+                <PaymentModal
+                    service={selectedService}
+                    onClose={() => setSelectedService(null)}
+                />
+            )}
         </section>
     );
 };
