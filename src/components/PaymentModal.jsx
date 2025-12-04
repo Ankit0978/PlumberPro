@@ -1,150 +1,112 @@
 import React, { useState, useEffect } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
-import { saveTransaction } from '../utils/transactionLogger';
+import { addTransaction, updateBookingStatus } from '../utils/db';
+import { useAuth } from '../context/AuthContext';
 
-const PaymentModal = ({ service, onClose }) => {
-    const [paymentStatus, setPaymentStatus] = useState('pending'); // pending, success
+const PaymentModal = ({ booking, onClose }) => {
+    const [step, setStep] = useState(1); // 1: Details, 2: Payment, 3: Success
+    const [amount, setAmount] = useState('');
+    const [paymentStatus, setPaymentStatus] = useState('pending');
     const [transactionId, setTransactionId] = useState('');
     const [transactionDate, setTransactionDate] = useState('');
-    const [amount, setAmount] = useState('');
+    const { user } = useAuth();
 
     useEffect(() => {
-        if (service) {
+        if (booking) {
             // Extract numeric value from price string if possible, else default to empty
-            const priceMatch = service.price.match(/₹([\d,]+)/);
+            const priceMatch = booking.price.toString().match(/(\d+)/);
             if (priceMatch) {
-                setAmount(priceMatch[1].replace(/,/g, ''));
+                setAmount(priceMatch[0]);
+            } else {
+                setAmount(booking.price);
             }
         }
-    }, [service]);
-
-    if (!service) return null;
-
-    const upiId = "ankitjha08400-2@okhdfcbank";
-    // Dynamic UPI link with amount
-    const upiLink = `upi://pay?pa=${upiId}&pn=Ankit%20Jha&am=${amount}&cu=INR`;
+    }, [booking]);
 
     const handlePayment = () => {
         // Simulate payment verification
         const mockTxnId = "TXN" + Math.floor(Math.random() * 1000000000);
-        const date = new Date().toUTCString();
+        const date = new Date().toISOString(); // Strict UTC
 
         setTransactionId(mockTxnId);
         setTransactionDate(date);
         setPaymentStatus('success');
 
-        // Log transaction
-        const newLog = {
+        // Log transaction to new DB
+        addTransaction({
             id: mockTxnId,
-            service: service.title,
+            service: booking.serviceTitle,
+            serviceId: booking.serviceId,
             amount: amount,
-            date: date,
-            timestamp: Date.now()
-        };
+            date: date, // UTC
+            timestamp: date, // UTC
+            customerId: user.id,
+            customerName: user.name,
+            agentId: booking.agentId
+        });
 
-        saveTransaction(newLog);
+        // Update booking status
+        updateBookingStatus(booking.id, 'paid');
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-overlay">
+            <div className="modal-content">
                 <button className="close-btn" onClick={onClose}>&times;</button>
 
-                <div className="modal-header">
-                    <div className="secure-badge">
-                        <span className="shield-icon">🛡️</span> 100% Secure Payment
-                    </div>
-                    <h2>{paymentStatus === 'success' ? 'Payment Successful' : 'Payment Gateway'}</h2>
-                </div>
-
-                <div className="payment-details">
-                    {paymentStatus === 'pending' ? (
-                        <>
-                            <div className="service-summary">
-                                <h3>{service.title}</h3>
-                                <p className="price-tag">{service.price}</p>
-                            </div>
-
-                            <div className="amount-input-section">
-                                <label>Enter Amount to Pay (₹):</label>
-                                <input
-                                    type="number"
-                                    value={amount}
-                                    onChange={(e) => setAmount(e.target.value)}
-                                    placeholder="Enter amount"
-                                    className="amount-input"
-                                />
-                            </div>
-
-                            <div className="qr-section">
-                                <div className="qr-container">
-                                    <QRCodeCanvas
-                                        value={upiLink}
-                                        size={200}
-                                        level={"H"}
-                                        includeMargin={true}
-                                        imageSettings={{
-                                            src: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1667px-Apple_logo_black.svg.png",
-                                            x: undefined,
-                                            y: undefined,
-                                            height: 24,
-                                            width: 24,
-                                            excavate: true,
-                                        }}
-                                    />
-                                </div>
-                                <p className="scan-text">Scan to Pay ₹{amount || '0'} with any UPI App</p>
-                                <div className="upi-id-box">
-                                    <span>UPI ID:</span>
-                                    <code>{upiId}</code>
-                                </div>
-                            </div>
-
-                            <div className="payment-actions">
-                                <button className="btn-paid" onClick={handlePayment} disabled={!amount || amount <= 0}>
-                                    I have Paid ₹{amount}
-                                </button>
-                            </div>
-
-                            <div className="payment-methods">
-                                <p>Accepted Methods:</p>
-                                <div className="methods-icons">
-                                    <span>GPay</span>
-                                    <span>PhonePe</span>
-                                    <span>Paytm</span>
-                                    <span>BHIM</span>
-                                </div>
-                            </div>
-                        </>
-                    ) : (
-                        <div className="success-view">
-                            <div className="success-icon">✅</div>
-                            <h3>Booking Confirmed!</h3>
-                            <p>Payment of <strong>₹{amount}</strong> received.</p>
-
-                            <div className="transaction-details">
-                                <div className="detail-row">
-                                    <span>Service:</span>
-                                    <strong>{service.title}</strong>
-                                </div>
-                                <div className="detail-row">
-                                    <span>Date:</span>
-                                    <strong>{transactionDate}</strong>
-                                </div>
-                                <div className="detail-row">
-                                    <span>Transaction ID:</span>
-                                    <code>{transactionId}</code>
-                                </div>
-                            </div>
-
-                            <p className="admin-note">
-                                Our team has been notified. We will contact you shortly at your registered number.
-                            </p>
-
-                            <button className="btn-primary" onClick={onClose}>Done</button>
+                {step === 1 && (
+                    <div className="modal-step">
+                        <h3>Confirm Payment</h3>
+                        <div className="service-summary">
+                            <p><strong>Service:</strong> {booking.serviceTitle}</p>
+                            <p><strong>Price:</strong> ₹{booking.price}</p>
                         </div>
-                    )}
-                </div>
+                        <div className="form-group">
+                            <label>Enter Amount to Pay:</label>
+                            <input
+                                type="number"
+                                value={amount}
+                                onChange={(e) => setAmount(e.target.value)}
+                                className="amount-input"
+                            />
+                        </div>
+                        <button className="btn btn-primary" onClick={() => setStep(2)}>Proceed to Pay</button>
+                    </div>
+                )}
+
+                {step === 2 && (
+                    <div className="modal-step">
+                        <h3>Scan to Pay</h3>
+                        <div className="qr-container">
+                            <QRCodeCanvas value={`upi://pay?pa=plumber@upi&pn=PlumberPro&am=${amount}&tn=${booking.serviceTitle}`} size={200} />
+                        </div>
+                        <p className="amount-display">Amount: ₹{amount}</p>
+                        <button className="btn btn-success" onClick={handlePayment}>I have Paid</button>
+                    </div>
+                )}
+
+                {step === 2 && paymentStatus === 'success' && (
+                    <div className="modal-step success-view">
+                        <div className="success-icon">✓</div>
+                        <h3>Payment Successful!</h3>
+                        <p>Your booking has been confirmed.</p>
+                        <div className="transaction-details">
+                            <div className="detail-row">
+                                <span>Transaction ID:</span>
+                                <strong>{transactionId}</strong>
+                            </div>
+                            <div className="detail-row">
+                                <span>Amount Paid:</span>
+                                <strong>₹{amount}</strong>
+                            </div>
+                            <div className="detail-row">
+                                <span>Date (UTC):</span>
+                                <strong>{transactionDate}</strong>
+                            </div>
+                        </div>
+                        <button className="btn btn-primary" onClick={onClose}>Close</button>
+                    </div>
+                )}
             </div>
         </div>
     );
