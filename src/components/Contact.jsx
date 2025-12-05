@@ -21,36 +21,53 @@ const Contact = () => {
                 async (position) => {
                     const lat = position.coords.latitude;
                     const lng = position.coords.longitude;
-                    let address = "Address not found";
-
-                    try {
-                        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
-                        const data = await response.json();
-                        if (data && data.display_name) {
-                            address = data.display_name;
-                        }
-                    } catch (error) {
-                        console.error("Error fetching address:", error);
-                    }
-
-                    setLocation({
-                        lat: lat,
-                        lng: lng,
-                        address: address
-                    });
-                    setIsLocating(false);
-                    alert('Location captured successfully!');
+                    await fetchAddress(lat, lng);
                 },
                 (error) => {
                     console.error("Error getting location:", error);
                     setIsLocating(false);
                     alert('Could not get location. Please ensure location services are enabled.');
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
                 }
             );
         } else {
             setIsLocating(false);
             alert('Geolocation is not supported by this browser.');
         }
+    };
+
+    const fetchAddress = async (lat, lng) => {
+        let address = "Address not found";
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+            const data = await response.json();
+            if (data && data.display_name) {
+                address = data.display_name;
+            }
+        } catch (error) {
+            console.error("Error fetching address:", error);
+        }
+
+        setLocation({
+            lat: lat,
+            lng: lng,
+            address: address
+        });
+        setIsLocating(false);
+        alert('Location captured successfully!');
+    };
+
+    // Test function for Pune location as requested
+    const handleTestLocation = () => {
+        setIsLocating(true);
+        // Mahalunge, Pune coordinates
+        const lat = 18.5765;
+        const lng = 73.7487;
+        fetchAddress(lat, lng);
     };
 
     const handleSubmit = (e) => {
@@ -122,6 +139,15 @@ const Contact = () => {
                             >
                                 {isLocating ? 'Locating...' : location ? '📍 Location Attached' : '📍 Share Current Location'}
                             </button>
+                            <div style={{ textAlign: 'center', marginTop: '5px' }}>
+                                <button
+                                    type="button"
+                                    onClick={handleTestLocation}
+                                    style={{ background: 'none', border: 'none', color: '#888', fontSize: '11px', cursor: 'pointer', textDecoration: 'underline' }}
+                                >
+                                    Test Location (Pune)
+                                </button>
+                            </div>
                             {location && <p style={{ color: 'green', fontSize: '12px', marginTop: '5px' }}>Location coordinates attached.</p>}
                         </div>
 
