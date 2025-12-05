@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import TransactionLogs from './TransactionLogs';
+import LeadsModal from './LeadsModal';
 
 const Header = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [showLogs, setShowLogs] = useState(false);
+    const [showLeads, setShowLeads] = useState(false);
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
@@ -43,6 +45,7 @@ const Header = () => {
                             <>
                                 <li><Link to="/admin" onClick={() => setIsOpen(false)}>Admin Panel</Link></li>
                                 <li><Link to="/signup" onClick={() => setIsOpen(false)}>Register User</Link></li>
+                                <li><button onClick={() => { setShowLeads(true); setIsOpen(false); }} className="btn-link" style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: 'inherit', fontFamily: 'inherit' }}>Leads Generated</button></li>
                                 <li><button onClick={() => { setShowLogs(true); setIsOpen(false); }} className="btn-link" style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: 'inherit', fontFamily: 'inherit' }}>Transactions</button></li>
                             </>
                         )}
@@ -59,6 +62,7 @@ const Header = () => {
                 </div>
             </div>
             {showLogs && <TransactionLogs onClose={() => setShowLogs(false)} />}
+            {showLeads && <LeadsModal onClose={() => setShowLeads(false)} />}
         </header>
     );
 };
