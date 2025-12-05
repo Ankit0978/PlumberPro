@@ -15,7 +15,7 @@ const Footer = () => {
                         <p>✉️ ankitjha084@gmail.com</p>
                     </div>
                 </div>
-                <p className="copyright">&copy; {new Date().getFullYear()} PlumberPro. All rights reserved.</p>
+                <p className="copyright">&copy; {new Date().getFullYear()} PlumberPro. All rights reserved. (v1.1)</p>
             </div>
         </footer>
     );
