@@ -5,7 +5,15 @@ const TransactionLogs = ({ onClose }) => {
     const [logs, setLogs] = useState([]);
 
     useEffect(() => {
+        // Initial fetch
         setLogs(getTransactions());
+
+        // Auto-refresh every 2 seconds to keep logs in sync
+        const interval = setInterval(() => {
+            setLogs(getTransactions());
+        }, 2000);
+
+        return () => clearInterval(interval);
     }, []);
 
     const handleClearLogs = () => {

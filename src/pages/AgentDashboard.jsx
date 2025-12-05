@@ -17,43 +17,65 @@ const InquiriesList = () => {
         }
     };
 
+    const downloadInquiries = () => {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(inquiries, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "inquiries.json");
+        document.body.appendChild(downloadAnchorNode); // required for firefox
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    };
+
     return (
-        <table className="table" style={{ width: '100%', marginTop: '20px', borderCollapse: 'collapse' }}>
-            <thead>
-                <tr style={{ textAlign: 'left', borderBottom: '1px solid #ddd' }}>
-                    <th style={{ padding: '10px' }}>Date</th>
-                    <th style={{ padding: '10px' }}>Name</th>
-                    <th style={{ padding: '10px' }}>Phone</th>
-                    <th style={{ padding: '10px' }}>Message</th>
-                    <th style={{ padding: '10px' }}>Location</th>
-                </tr>
-            </thead>
-            <tbody>
-                {inquiries.map(inq => (
-                    <tr key={inq.id} style={{ borderBottom: '1px solid #eee' }}>
-                        <td style={{ padding: '10px' }}>{new Date(inq.timestamp).toLocaleDateString()}</td>
-                        <td style={{ padding: '10px' }}>{inq.name}</td>
-                        <td style={{ padding: '10px' }}>{inq.phone}</td>
-                        <td style={{ padding: '10px' }}>{inq.message}</td>
-                        <td style={{ padding: '10px' }}>
-                            <button
-                                onClick={() => openLocation(inq.location)}
-                                className="btn btn-secondary"
-                                style={{ padding: '5px 10px', fontSize: '12px' }}
-                                disabled={!inq.location}
-                            >
-                                {inq.location ? '📍 View Map' : 'No Location'}
-                            </button>
-                        </td>
+        <div>
+            <div style={{ marginBottom: '10px', textAlign: 'right' }}>
+                <button
+                    onClick={downloadInquiries}
+                    className="btn btn-secondary"
+                    disabled={inquiries.length === 0}
+                    style={{ fontSize: '14px', padding: '8px 12px' }}
+                >
+                    ⬇️ Download JSON
+                </button>
+            </div>
+            <table className="table" style={{ width: '100%', marginTop: '10px', borderCollapse: 'collapse' }}>
+                <thead>
+                    <tr style={{ textAlign: 'left', borderBottom: '1px solid #ddd' }}>
+                        <th style={{ padding: '10px' }}>Date</th>
+                        <th style={{ padding: '10px' }}>Name</th>
+                        <th style={{ padding: '10px' }}>Phone</th>
+                        <th style={{ padding: '10px' }}>Message</th>
+                        <th style={{ padding: '10px' }}>Location</th>
                     </tr>
-                ))}
-                {inquiries.length === 0 && (
-                    <tr>
-                        <td colSpan="5" style={{ padding: '20px', textAlign: 'center' }}>No inquiries yet.</td>
-                    </tr>
-                )}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {inquiries.map(inq => (
+                        <tr key={inq.id} style={{ borderBottom: '1px solid #eee' }}>
+                            <td style={{ padding: '10px' }}>{new Date(inq.timestamp).toLocaleDateString()}</td>
+                            <td style={{ padding: '10px' }}>{inq.name}</td>
+                            <td style={{ padding: '10px' }}>{inq.phone}</td>
+                            <td style={{ padding: '10px' }}>{inq.message}</td>
+                            <td style={{ padding: '10px' }}>
+                                <button
+                                    onClick={() => openLocation(inq.location)}
+                                    className="btn btn-secondary"
+                                    style={{ padding: '5px 10px', fontSize: '12px' }}
+                                    disabled={!inq.location}
+                                >
+                                    {inq.location ? '📍 View Map' : 'No Location'}
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                    {inquiries.length === 0 && (
+                        <tr>
+                            <td colSpan="5" style={{ padding: '20px', textAlign: 'center' }}>No inquiries yet.</td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
+        </div>
     );
 };
 
