@@ -1,27 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://plumberpro.com/</loc>
-    <lastmod>2023-10-27</lastmod>
+    <loc>https://plumber-pro-iota.vercel.app/</loc>
+    <lastmod>2025-12-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://plumberpro.com/#services</loc>
-    <lastmod>2023-10-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://plumberpro.com/#reviews</loc>
-    <lastmod>2023-10-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://plumberpro.com/#contact</loc>
-    <lastmod>2023-10-27</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
   </url>
 </urlset>

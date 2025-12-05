@@ -4,7 +4,7 @@ const Hero = () => {
     return (
         <section id="hero" className="hero">
             <div className="hero-content">
-                <h2>Expert Plumbing Services in <span className="highlight">Balewadi & Baner</span></h2>
+                <h1>Expert Plumbing Services in <span className="highlight">Balewadi & Baner</span></h1>
                 <p>Professional, reliable, and affordable plumbing solutions for your home and office.</p>
                 <div className="hero-buttons">
                     <a href="#contact" className="btn btn-primary">Book Now</a>
