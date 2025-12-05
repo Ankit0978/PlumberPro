@@ -46,7 +46,7 @@ const InquiriesList = () => {
                         <th style={{ padding: '10px' }}>Name</th>
                         <th style={{ padding: '10px' }}>Phone</th>
                         <th style={{ padding: '10px' }}>Message</th>
-                        <th style={{ padding: '10px' }}>Location</th>
+                        <th style={{ padding: '10px' }}>Location / Address</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -57,14 +57,20 @@ const InquiriesList = () => {
                             <td style={{ padding: '10px' }}>{inq.phone}</td>
                             <td style={{ padding: '10px' }}>{inq.message}</td>
                             <td style={{ padding: '10px' }}>
-                                <button
-                                    onClick={() => openLocation(inq.location)}
-                                    className="btn btn-secondary"
-                                    style={{ padding: '5px 10px', fontSize: '12px' }}
-                                    disabled={!inq.location}
-                                >
-                                    {inq.location ? '📍 View Map' : 'No Location'}
-                                </button>
+                                {inq.location ? (
+                                    <div>
+                                        <div style={{ fontSize: '0.85rem', marginBottom: '5px', maxWidth: '200px', whiteSpace: 'normal' }}>
+                                            {inq.location.address || 'Coords only'}
+                                        </div>
+                                        <button
+                                            onClick={() => openLocation(inq.location)}
+                                            className="btn btn-secondary"
+                                            style={{ padding: '5px 10px', fontSize: '12px' }}
+                                        >
+                                            📍 View Map
+                                        </button>
+                                    </div>
+                                ) : 'No Location'}
                             </td>
                         </tr>
                     ))}

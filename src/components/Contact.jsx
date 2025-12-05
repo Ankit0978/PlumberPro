@@ -18,10 +18,25 @@ const Contact = () => {
         setIsLocating(true);
         if ('geolocation' in navigator) {
             navigator.geolocation.getCurrentPosition(
-                (position) => {
+                async (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    let address = "Address not found";
+
+                    try {
+                        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+                        const data = await response.json();
+                        if (data && data.display_name) {
+                            address = data.display_name;
+                        }
+                    } catch (error) {
+                        console.error("Error fetching address:", error);
+                    }
+
                     setLocation({
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
+                        lat: lat,
+                        lng: lng,
+                        address: address
                     });
                     setIsLocating(false);
                     alert('Location captured successfully!');

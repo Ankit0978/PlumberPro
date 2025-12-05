@@ -55,25 +55,31 @@ const LeadsModal = ({ onClose }) => {
                                         <th>Name</th>
                                         <th>Phone</th>
                                         <th>Message</th>
-                                        <th>Location</th>
+                                        <th>Location / Address</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {leads.map((lead, index) => (
                                         <tr key={index}>
-                                            <td>{new Date(lead.timestamp).toLocaleDateString()}</td>
+                                            <td>{new Date(lead.timestamp).toLocaleDateString()} {new Date(lead.timestamp).toLocaleTimeString()}</td>
                                             <td>{lead.name}</td>
                                             <td>{lead.phone}</td>
                                             <td>{lead.message}</td>
                                             <td>
-                                                <button
-                                                    onClick={() => openLocation(lead.location)}
-                                                    className="btn btn-secondary"
-                                                    style={{ padding: '2px 8px', fontSize: '12px' }}
-                                                    disabled={!lead.location}
-                                                >
-                                                    {lead.location ? '📍 Map' : 'N/A'}
-                                                </button>
+                                                {lead.location ? (
+                                                    <div>
+                                                        <div style={{ fontSize: '0.85rem', marginBottom: '5px', maxWidth: '200px', whiteSpace: 'normal' }}>
+                                                            {lead.location.address || 'Coords only'}
+                                                        </div>
+                                                        <button
+                                                            onClick={() => openLocation(lead.location)}
+                                                            className="btn btn-secondary"
+                                                            style={{ padding: '2px 8px', fontSize: '11px' }}
+                                                        >
+                                                            📍 View Map
+                                                        </button>
+                                                    </div>
+                                                ) : 'N/A'}
                                             </td>
                                         </tr>
                                     ))}
