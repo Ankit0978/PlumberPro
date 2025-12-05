@@ -8,7 +8,8 @@ const DB_KEYS = {
     SERVICES: 'plumber_services',
     TRANSACTIONS: 'plumber_transactions',
     BOOKINGS: 'plumber_bookings',
-    CURRENT_USER: 'plumber_current_user'
+    CURRENT_USER: 'plumber_current_user',
+    INQUIRIES: 'plumber_inquiries'
 };
 
 // Initialize DB with default data if empty
@@ -31,6 +32,9 @@ export const initDB = () => {
     }
     if (!localStorage.getItem(DB_KEYS.BOOKINGS)) {
         localStorage.setItem(DB_KEYS.BOOKINGS, JSON.stringify([]));
+    }
+    if (!localStorage.getItem(DB_KEYS.INQUIRIES)) {
+        localStorage.setItem(DB_KEYS.INQUIRIES, JSON.stringify([]));
     }
 };
 
@@ -161,4 +165,23 @@ export const refundTransaction = (transactionId) => {
         transactions[index].status = 'refunded';
         localStorage.setItem(DB_KEYS.TRANSACTIONS, JSON.stringify(transactions));
     }
+};
+
+// --- Inquiry Operations (Contact Form) ---
+
+export const addInquiry = (inquiry) => {
+    const inquiries = JSON.parse(localStorage.getItem(DB_KEYS.INQUIRIES) || '[]');
+    const newInquiry = {
+        ...inquiry,
+        id: 'inq_' + Date.now(),
+        timestamp: new Date().toISOString(),
+        status: 'open'
+    };
+    inquiries.push(newInquiry);
+    localStorage.setItem(DB_KEYS.INQUIRIES, JSON.stringify(inquiries));
+    return newInquiry;
+};
+
+export const getInquiries = () => {
+    return JSON.parse(localStorage.getItem(DB_KEYS.INQUIRIES) || '[]');
 };
