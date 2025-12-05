@@ -55,6 +55,9 @@ const TransactionLogs = ({ onClose }) => {
                 </div>
 
                 <div className="logs-footer">
+                    <button className="btn-secondary" onClick={() => setLogs(getTransactions())}>
+                        Refresh
+                    </button>
                     <button className="btn-secondary" onClick={downloadLogsAsCSV} disabled={logs.length === 0}>
                         Download CSV
                     </button>

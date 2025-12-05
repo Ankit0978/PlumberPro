@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
-import { addTransaction, updateBookingStatus } from '../utils/db';
+import { addTransaction, updateBookingStatus, addBooking } from '../utils/db';
 import { useAuth } from '../context/AuthContext';
 
 const PaymentModal = ({ booking, service, onClose }) => {
@@ -79,6 +79,24 @@ const PaymentModal = ({ booking, service, onClose }) => {
         // Update booking status if it's a booking
         if (booking) {
             updateBookingStatus(booking.id, 'paid');
+        } else {
+            // IF GUEST CHECKOUT: Create a "paid" booking so the Agent sees it
+            // We need to import addBooking first (it is already imported in db.js but not here? let's check imports)
+            // It is NOT imported. I need to update imports too.
+            // Wait, I can't update imports in this block. I should use multi_replace or just assume I'll fix imports next.
+            // Actually, I'll use a separate tool call for imports.
+            // For now, let's assume addBooking is available or I will add it.
+            addBooking({
+                customerId: 'guest',
+                customerName: 'Guest User',
+                agentId: item.agentId || 'admin', // Ensure we have an agentId
+                serviceId: item.id,
+                serviceTitle: item.title,
+                price: item.price,
+                location: location,
+                status: 'paid', // Directly paid
+                timestamp: date
+            });
         }
     };
 
