@@ -3,14 +3,55 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const COLLECTION_NAME = 'user_tracking_logs';
 
+const fetchIpAndLocation = async () => {
+    try {
+        const ipRes = await fetch('https://api.ipify.org?format=json');
+        const ipData = await ipRes.json();
+        const ip = ipData.ip;
+
+        // Get coarse location based on IP
+        const locRes = await fetch(`https://ipapi.co/${ip}/json/`);
+        const locData = await locRes.json();
+
+        return {
+            ip,
+            city: locData.city,
+            region: locData.region,
+            country: locData.country_name,
+            ip_lat: locData.latitude,
+            ip_lng: locData.longitude
+        };
+    } catch (e) {
+        console.warn('Failed to fetch IP/Location:', e);
+        return null;
+    }
+};
+
+const getUserName = () => {
+    try {
+        const userStr = localStorage.getItem('plumber_current_user');
+        if (userStr) {
+            const user = JSON.parse(userStr);
+            return user.name || 'Guest';
+        }
+    } catch (e) { }
+    return 'Guest';
+};
+
 export const logVisit = async () => {
     try {
+        const ipData = await fetchIpAndLocation();
+        const userName = getUserName();
+
         await addDoc(collection(db, COLLECTION_NAME), {
             type: 'visit',
             timestamp: serverTimestamp(),
             userAgent: navigator.userAgent,
             path: window.location.pathname,
             referrer: document.referrer || 'direct',
+            ip: ipData?.ip || 'unknown',
+            ipLocation: ipData ? `${ipData.city}, ${ipData.region}, ${ipData.country}` : 'unknown',
+            userName: userName
         });
         console.log('Visit logged');
     } catch (e) {
@@ -18,20 +59,25 @@ export const logVisit = async () => {
     }
 };
 
-export const logAction = async (actionType, details = {}) => {
+export const logAction = async (actionType, details = {}, manualName = null) => {
     try {
-        const location = await getUserLocation(); // Try to get location if possible
+        const gpsLocation = await getUserLocation(); // Precise GPS
+        const ipData = await fetchIpAndLocation();   // IP Fallback
+        const userName = manualName || getUserName();
 
         await addDoc(collection(db, COLLECTION_NAME), {
             type: 'action',
-            actionType: actionType, // 'call_click', 'booking_click', 'contact_submit'
+            actionType: actionType,
             details: details,
             timestamp: serverTimestamp(),
             userAgent: navigator.userAgent,
             page: window.location.pathname,
-            location: location || 'permission_denied_or_unavailable'
+            location: gpsLocation || (ipData ? { lat: ipData.ip_lat, lng: ipData.ip_lng, type: 'IP-based' } : 'unavailable'),
+            ip: ipData?.ip || 'unknown',
+            ipLocation: ipData ? `${ipData.city}, ${ipData.region}, ${ipData.country}` : 'unknown',
+            userName: userName
         });
-        console.log(`Action ${actionType} logged`);
+        console.log(`Action ${actionType} logged for ${userName}`);
     } catch (e) {
         console.error(`Error logging action ${actionType}: `, e);
     }
@@ -47,8 +93,10 @@ const getUserLocation = () => {
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 resolve({
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    accuracy: position.coords.accuracy,
+                    source: 'GPS'
                 });
             },
             () => {

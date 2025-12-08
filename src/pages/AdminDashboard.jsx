@@ -92,12 +92,14 @@ const AdminDashboard = () => {
 
         // Tracking Sheet (Active Users)
         const wsTracking = XLSX.utils.json_to_sheet(trackingLogs.map(log => ({
-            Type: log.type,
-            Action: log.actionType || '-',
-            Page: log.page || log.path || '-',
-            Time: log.date,
-            Location: log.location ? JSON.stringify(log.location) : '-',
-            Details: log.details ? JSON.stringify(log.details) : '-'
+            "Time": log.date,
+            "User Name": log.userName || 'Guest',
+            "Type": log.type,
+            "Action/Page": log.actionType || log.page || log.path || '-',
+            "IP Address": log.ip || '-',
+            "Coarse Location (City/Region)": log.ipLocation || '-',
+            "GPS Location": log.location && typeof log.location === 'object' ? `${log.location.latitude}, ${log.location.longitude}` : (typeof log.location === 'string' ? log.location : '-'),
+            "Details": log.details ? JSON.stringify(log.details) : '-'
         })));
         XLSX.utils.book_append_sheet(wb, wsTracking, "Active Users");
 
@@ -142,16 +144,19 @@ const AdminDashboard = () => {
                             <thead style={{ position: 'sticky', top: 0, backgroundColor: 'white' }}>
                                 <tr>
                                     <th>Time</th>
+                                    <th>User Name</th>
                                     <th>Type</th>
                                     <th>Action / Page</th>
+                                    <th>Location (IP/GPS)</th>
+                                    <th>IP Address</th>
                                     <th>Details</th>
-                                    <th>Location</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {trackingLogs.map(log => (
                                     <tr key={log.id} style={{ borderBottom: '1px solid #eee' }}>
                                         <td>{log.date}</td>
+                                        <td><strong>{log.userName || 'Guest'}</strong></td>
                                         <td>
                                             <span style={{
                                                 padding: '2px 6px',
@@ -163,13 +168,16 @@ const AdminDashboard = () => {
                                             </span>
                                         </td>
                                         <td>{log.actionType || log.path}</td>
+                                        <td style={{ maxWidth: '200px', fontSize: '12px' }}>
+                                            {log.location && typeof log.location === 'object'
+                                                ? `GPS: ${log.location.latitude?.toFixed(4)}, ${log.location.longitude?.toFixed(4)}`
+                                                : log.ipLocation || '-'}
+                                        </td>
+                                        <td>{log.ip || '-'}</td>
                                         <td>
                                             {log.details ? (
                                                 <pre style={{ margin: 0, fontSize: '11px' }}>{JSON.stringify(log.details, null, 2)}</pre>
                                             ) : '-'}
-                                        </td>
-                                        <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                            {log.location ? JSON.stringify(log.location) : '-'}
                                         </td>
                                     </tr>
                                 ))}

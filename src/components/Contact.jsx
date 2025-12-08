@@ -80,7 +80,7 @@ const Contact = () => {
             ...formData,
             location
         });
-        logAction('contact_form_submit', { ...formData, hasLocation: !!location });
+        logAction('contact_form_submit', { ...formData, hasLocation: !!location }, formData.name);
         alert('Message sent successfully! An agent will contact you shortly.');
         setFormData({ name: '', phone: '', message: '' });
         setLocation(null);
