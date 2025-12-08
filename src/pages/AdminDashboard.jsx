@@ -121,14 +121,14 @@ const AdminDashboard = () => {
                     onClick={() => setActiveTab('tracking')}
                     style={{ padding: '10px 20px', cursor: 'pointer', background: activeTab === 'tracking' ? '#007bff' : 'none', color: activeTab === 'tracking' ? 'white' : 'black', border: 'none' }}
                 >
-                    Active Users & Tracking
+                    Clicked Users Tracking
                 </button>
             </div>
 
             {activeTab === 'tracking' && (
                 <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                        <h3>Live User Activity</h3>
+                        <h3>Clicked Users & Activity</h3>
                         <button onClick={exportToExcel} className="btn btn-success" style={{ backgroundColor: '#28a745' }}>Download Excel Report</button>
                     </div>
                     <div style={{ overflowX: 'auto', maxHeight: '500px', overflowY: 'auto', border: '1px solid #ddd' }}>
