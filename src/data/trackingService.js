@@ -41,6 +41,7 @@ const getUserName = () => {
 export const logVisit = async () => {
     try {
         const ipData = await fetchIpAndLocation();
+        const gpsLocation = await getUserLocation(); // Try getting GPS if permission exists
         const userName = getUserName();
 
         await addDoc(collection(db, COLLECTION_NAME), {
@@ -51,6 +52,7 @@ export const logVisit = async () => {
             referrer: document.referrer || 'direct',
             ip: ipData?.ip || 'unknown',
             ipLocation: ipData ? `${ipData.city}, ${ipData.region}, ${ipData.country}` : 'unknown',
+            location: gpsLocation || (ipData ? { lat: ipData.ip_lat, lng: ipData.ip_lng, type: 'IP-based' } : 'unavailable'),
             userName: userName
         });
         console.log('Visit logged');
