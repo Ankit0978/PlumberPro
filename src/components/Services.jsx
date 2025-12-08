@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getApprovedServices } from '../utils/db';
 import { services as staticServices } from '../data/servicesData';
 import PaymentModal from './PaymentModal';
+import { logAction } from '../data/trackingService';
 
 const Services = () => {
     const [services, setServices] = useState([]);
@@ -21,6 +22,11 @@ const Services = () => {
         return () => window.removeEventListener('storage', fetchServices);
     }, []);
 
+    const handleBookClick = (service) => {
+        logAction('book_service_click', { serviceTitle: service.title, price: service.price });
+        setSelectedService(service);
+    };
+
     return (
         <section id="services" className="services section">
             <div className="container">
@@ -37,7 +43,7 @@ const Services = () => {
                             <p className="description">{service.description}</p>
                             <button
                                 className="btn-book"
-                                onClick={() => setSelectedService(service)}
+                                onClick={() => handleBookClick(service)}
                             >
                                 Book & Pay
                             </button>

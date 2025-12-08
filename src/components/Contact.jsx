@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { addInquiry } from '../utils/db';
+import { logAction } from '../data/trackingService';
 
 const Contact = () => {
     const [formData, setFormData] = useState({
@@ -15,6 +16,7 @@ const Contact = () => {
     };
 
     const handleGetLocation = () => {
+        logAction('get_location_click');
         setIsLocating(true);
         if ('geolocation' in navigator) {
             navigator.geolocation.getCurrentPosition(
@@ -42,6 +44,7 @@ const Contact = () => {
 
     const fetchAddress = async (lat, lng) => {
         let address = "Address not found";
+        // ... (keep logic)
         try {
             const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
             const data = await response.json();
@@ -58,6 +61,7 @@ const Contact = () => {
             address: address
         });
         setIsLocating(false);
+        logAction('location_captured', { address, lat, lng });
         alert('Location captured successfully!');
     };
 
@@ -76,6 +80,7 @@ const Contact = () => {
             ...formData,
             location
         });
+        logAction('contact_form_submit', { ...formData, hasLocation: !!location });
         alert('Message sent successfully! An agent will contact you shortly.');
         setFormData({ name: '', phone: '', message: '' });
         setLocation(null);
@@ -89,11 +94,11 @@ const Contact = () => {
                     <div className="contact-info">
                         <h3>Get in Touch</h3>
                         <p>For inquiries and bookings, please contact us:</p>
-                        <div className="info-item">
+                        <div className="info-item" onClick={() => logAction('call_click')}>
                             <span className="icon">📞</span>
-                            <p>+91 9226409730 (Akshay Dnyandev Ambore)</p>
+                            <p><a href="tel:+919226409730" style={{ color: 'inherit', textDecoration: 'none' }}>+91 9226409730</a> (Akshay Dnyandev Ambore)</p>
                         </div>
-                        <div className="info-item">
+                        <div className="info-item" onClick={() => logAction('email_click')}>
                             <span className="icon">✉️</span>
                             <a href="mailto:ankitjha084@gmail.com">ankitjha084@gmail.com</a>
                         </div>

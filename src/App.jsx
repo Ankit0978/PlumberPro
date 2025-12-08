@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Header from './components/Header';
@@ -9,6 +9,7 @@ import Signup from './pages/Signup';
 import AdminDashboard from './pages/AdminDashboard';
 import AgentDashboard from './pages/AgentDashboard';
 import CustomerDashboard from './pages/CustomerDashboard';
+import { logVisit } from './data/trackingService';
 import './index.css';
 
 // Protected Route Component
@@ -27,6 +28,10 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 };
 
 function App() {
+  useEffect(() => {
+    logVisit();
+  }, []);
+
   return (
     <AuthProvider>
       <Router>
