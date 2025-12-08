@@ -3,6 +3,7 @@ import { getUsers, getTransactions, getServices, updateServiceStatus, refundTran
 import { db } from '../firebase';
 import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
 import * as XLSX from 'xlsx';
+import { useLocation } from 'react-router-dom';
 
 const AdminDashboard = () => {
     const [users, setUsers] = useState([]);
@@ -12,6 +13,7 @@ const AdminDashboard = () => {
     const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'customer' });
     const [trackingLogs, setTrackingLogs] = useState([]);
     const [activeTab, setActiveTab] = useState('overview');
+    const location = useLocation();
 
     const refreshData = () => {
         setUsers(getUsers());
@@ -23,6 +25,10 @@ const AdminDashboard = () => {
     };
 
     useEffect(() => {
+        if (location.state && location.state.activeTab) {
+            setActiveTab(location.state.activeTab);
+        }
+
         refreshData();
 
         // Realtime logs listener
@@ -38,7 +44,7 @@ const AdminDashboard = () => {
         });
 
         return () => unsubscribe();
-    }, []);
+    }, [location]);
 
     const handleServiceAction = (id, status) => {
         updateServiceStatus(id, status);
@@ -84,7 +90,7 @@ const AdminDashboard = () => {
     const exportToExcel = () => {
         const wb = XLSX.utils.book_new();
 
-        // Tracking Sheet
+        // Tracking Sheet (Active Users)
         const wsTracking = XLSX.utils.json_to_sheet(trackingLogs.map(log => ({
             Type: log.type,
             Action: log.actionType || '-',
@@ -93,7 +99,7 @@ const AdminDashboard = () => {
             Location: log.location ? JSON.stringify(log.location) : '-',
             Details: log.details ? JSON.stringify(log.details) : '-'
         })));
-        XLSX.utils.book_append_sheet(wb, wsTracking, "User Activity");
+        XLSX.utils.book_append_sheet(wb, wsTracking, "Active Users");
 
         // Users Sheet
         const wsUsers = XLSX.utils.json_to_sheet(users);

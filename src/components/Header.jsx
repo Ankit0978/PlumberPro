@@ -44,6 +44,7 @@ const Header = () => {
                         {user && user.role === 'admin' && (
                             <>
                                 <li><Link to="/admin" className="nav-link" onClick={() => setIsOpen(false)}>Admin Panel</Link></li>
+                                <li><button onClick={() => { navigate('/admin', { state: { activeTab: 'tracking' } }); setIsOpen(false); }} className="nav-link">Active Users</button></li>
                                 <li><Link to="/signup" className="nav-link" onClick={() => setIsOpen(false)}>Register User</Link></li>
                                 <li><button onClick={() => { setShowLeads(true); setIsOpen(false); }} className="nav-link">Leads Generated</button></li>
                                 <li><button onClick={() => { setShowLogs(true); setIsOpen(false); }} className="nav-link">Transactions</button></li>
